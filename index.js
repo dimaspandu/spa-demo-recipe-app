@@ -96,3 +96,5 @@ app.addNotifier("transition", function() {
 
 // --- Start app routing ---
 app.tap();
+
+export default app;

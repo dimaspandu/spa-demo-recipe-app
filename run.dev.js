@@ -10,11 +10,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
- * Execute the bundler.
- */
-await import("./run.bundle.js");
-
-/**
  * Create a basic static HTTP server.
  *
  * rootDir:
@@ -64,4 +59,4 @@ function createStaticServer(rootDir, port) {
 /**
  * Start the development server for bundled output.
  */
-createStaticServer(path.join(__dirname, "dist"), 5151);
+createStaticServer(__dirname, 5000);
