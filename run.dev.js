@@ -4,19 +4,24 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 /**
- * Resolve __filename and __dirname in ESM context.
+ * Resolve __filename and __dirname for ESM modules.
+ * (Node.js does not expose them by default in ESM.)
  */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
- * Create a basic static HTTP server.
+ * Create a minimal static HTTP server.
  *
- * rootDir:
- *   Directory to be served as the web root.
+ * This server:
+ * - Serves files directly from disk
+ * - Does NOT perform SPA fallback routing
+ * - Does NOT run the bundler
  *
- * port:
- *   Local port to listen on.
+ * Intended for development/debugging only.
+ *
+ * @param {string} rootDir - Directory to serve as web root
+ * @param {number} port   - Port to listen on
  */
 function createStaticServer(rootDir, port) {
   const server = http.createServer((req, res) => {
@@ -51,12 +56,14 @@ function createStaticServer(rootDir, port) {
   });
 
   server.listen(port, () => {
-    console.log(`✔ Server running at http://localhost:${port}`);
-    console.log(`  Serving: ${rootDir}`);
+    console.log(`✔ Dev server running at http://localhost:${port}`);
+    console.log(`  Serving source from: ${rootDir}`);
   });
 }
 
 /**
- * Start the development server for bundled output.
+ * Start development server.
+ *
+ * Serves project root directly without bundling.
  */
 createStaticServer(__dirname, 5000);

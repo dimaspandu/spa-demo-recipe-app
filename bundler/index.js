@@ -89,7 +89,7 @@ function createNode(filename, separated = false) {
    */
   const transformedCode = (() => {
     if (ext === ".css") {
-      return minifyCSS(rawCode, { level: CSS_MINIFY_LEVEL.SMART });
+      return minifyCSS(rawCode, { level: CSS_MINIFY_LEVEL.SAFE });
     }
 
     if (ext === ".svg" || ext === ".xml") {

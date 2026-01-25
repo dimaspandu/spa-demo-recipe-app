@@ -1,237 +1,230 @@
 # SPA-JSPLUS
 
-SPA-JSPlus is a simple implementation of a **Single Page Application (SPA)** built with **vanilla JavaScript**.
-This project is **not a library or framework**, but rather a **pattern/example** that demonstrates how SPA needs can be solved without relying on modern frameworks.
+**SPA-JSPlus** is an experimental **Single Page Application architecture** built using **vanilla JavaScript (ESM)**.
 
-This repository is part of the implementation of **SPA-JSPlus**.  
-For the core repository, please visit: [https://github.com/dimaspandu/spa-jsplus](https://github.com/dimaspandu/spa-jsplus).
+This repository is an **example/demo project** that showcases how the SPA-JSPlus analyzer, bundler, and runtime work together in a real application.
 
-The goals are:
+The core SPA-JSPlus project lives here:
+[https://github.com/dimaspandu/spa-jsplus](https://github.com/dimaspandu/spa-jsplus)
 
-* To inspire developers who still enjoy working with **vanillaJS**.
-* To provide a real-world example of how routing, state, and lifecycle management can be achieved with minimal code.
-* To be easily adopted or customized for project-specific needs.
+This project is **not a framework** and **not a library**.
+It is a **reference implementation** that demonstrates how a modern SPA can be built using:
+
+* native ES modules
+* explicit routing & lifecycle control
+* a lightweight analyzer + bundler pipeline
+* zero runtime dependencies
+
+> Think of this repo as a **learning-grade SPA engine + tooling**, not a drop-in replacement for React/Vue.
 
 ---
 
-## Demo: Recipe App
+## Philosophy
 
-This folder (`examples/demo-recipe-app`) contains a **Recipe Application** built with the SPA-JSPlus pattern.
-It demonstrates how to implement routing, modals, and state management in a real-world scenario using **vanilla JavaScript**.
+SPA-JSPlus is designed with the following principles:
+
+* **Vanilla-first**
+  No JSX, no virtual DOM, no framework magic.
+
+* **Explicit over implicit**
+  Routing, lifecycle, and transitions are handled intentionally.
+
+* **Tooling as learning surface**
+  Analyzer, bundler, and runtime are readable and hackable.
+
+* **Separation of concerns**
+
+  * *Analyzer* → dependency graph
+  * *Bundler* → output orchestration
+  * *SPA engine* → runtime behavior
+
+---
+
+## Demo Project: Recipe App
+
+This repository contains a **Recipe Application demo** that integrates:
+
+* SPA engine
+* analyzer
+* bundler
+* multiple execution modes
+
+It serves as a **real-world reference** for how the system is meant to be used.
 
 ### Features
 
-* **Home Page** → Displays a list of recipes.
-* **Favorites Page** → Shows only the recipes marked as favorite.
-* **Recipe Details Modal** → Opens when you click a recipe, showing its ingredients and instructions.
-* **Favorite/Unfavorite** → Toggle favorite status of each recipe.
-* **Bottom Navigation** → Switch between Home and Favorites with active state styling.
-* **404 Page** → Displays an error page for unknown routes.
+* Home & Favorites routes
+* Modal routing via query params
+* Back/forward history awareness
+* Route lifecycle hooks (`onMeet`, `endReactor`)
+* Transition indicators
+* Custom 404 handling
+* Asset & CSS bundling
 
-### Screenshot
+---
 
-![Recipe App Screenshot](assets/screenshot.png)
+## Execution Modes
+
+This project intentionally supports **three different ways to run the app**.
+
+### 1️⃣ Development Mode (Native ESM)
+
+**No bundling. No Node server.**
+
+```text
+Browser → index.html → native ES modules
+```
+
+How to run:
+
+* Open `index.html` directly
+* Or use VSCode **Live Server**
+
+Best for:
+
+* Debugging browser behavior
+* Understanding SPA internals
+* Learning how modules interact
+
+---
+
+### 2️⃣ Bundle Only (Build Step)
+
+Runs analyzer + bundler **without starting a server**.
+
+```bash
+node run.bundle.js
+```
+
+What it does:
+
+* Traverses dependencies starting from `pre-index.js`
+* Emits bundled JS + copied assets into `dist/`
+* Applies minification if enabled
+
+Used by:
+
+* CDN builds
+* CI pipelines
+* Static hosting
+
+---
+
+### 3️⃣ Bundled Start (Production-like)
+
+```bash
+node run.start.js
+```
+
+What happens:
+
+1. Runs `run.bundle.js`
+2. Serves the `dist/` directory via a static Node server
+
+This simulates:
+
+* production output
+* deployable static assets
+* no source files exposed
 
 ---
 
 ## Project Structure
 
 ```
-├── assets/                # Static assets (images, icons, etc.)
-├── dist/                  # Build output (generated after build)
-├── helpers/               # Helper modules (modal, rendering, etc.)
-├── models/                # Data models
-├── spa/                   # Core SPA engine (spa.js, router, etc.)
-├── 404.html               # Custom error page
-├── app.js                 # Main app entry logic
-├── config.json            # Bundle + build + start configuration
-├── favorites.html         # Favorites page
-├── index.css              # Styles
-├── index.html             # Main HTML entry point
-├── index.js               # JavaScript entry point
-├── run.build.js           # Run build (bundle + copy assets)
-├── run.bundle.js          # Only run bundler
-├── run.start.js           # Start server for dist/
+├── assets/            # Static assets (images, etc.)
+├── bundler/           # Analyzer + bundler implementation
+├── dist/              # Generated output (after bundle)
+├── helpers/           # UI & DOM helpers
+├── models/            # Data models
+├── spa/               # Core SPA engine
+│
+├── app.js             # Application bootstrap
+├── index.js           # Route & reactor definitions
+├── pre-index.js       # Bundler manifest entry
+│
+├── index.html         # Main HTML entry
+├── favorites.html     # Favorites page
+├── 404.html           # Error page
+│
+├── run.dev.js         # Native ESM dev server
+├── run.bundle.js      # Bundler entry
+├── run.start.js       # Bundle + serve
 ```
 
 ---
 
-## Usage
+## Key Files Explained
 
-### Development Mode (Direct HTML)
+### `pre-index.js`
 
-For quick testing during development, you can skip the build step:
-
-1. Open the file `index.html` inside your editor.  
-2. If you’re using **VSCode**, right-click `index.html` → **Open with Live Server**.  
-3. The app will run immediately without bundling or running Node.js scripts.  
-
-This mode is recommended for local development and debugging.
-
----
-
-### Bundle
-
-Generate the bundled JavaScript only (written into `dist/index.js`):
-
-```bash
-node run.bundle.js
-```
-
----
-
-### Build
-
-Bundle + copy assets + preprocess files:
-
-```bash
-node run.build.js
-```
-
----
-
-### Start Build
-
-Serve the `dist/` directory (production-like mode):
-
-```bash
-node run.start.js
-```
-
----
-
-### Build & Start Combined
-
-You can also run build and then start immediately:
-
-```bash
-node run.build.js && node run.start.js
-```
-
----
-
-## Example Code
-
-Here is a snippet from `index.js` showing how routes are declared:
+This file acts as the **bundle manifest**.
 
 ```js
-import { app } from "./app.js";
-import {
-  closeModal,
-  openModal
-} from "./helpers/modal.js";
-import { hideTransitionIndicator } from "./helpers/hideTransitionIndicator.js";
-import { renderError } from "./helpers/renderError.js";
-import { renderRecipes } from "./helpers/renderRecipes.js";
-import { setActiveNav } from "./helpers/setActiveNav.js";
+import "./index.html";
+import "./favorites.html";
+import "./404.html";
+import "./assets/example.png";
 
-// --- Home reactor ---
-app.reactor(["", "/", "/home"], function(ctx) {
-  // ctx.container is always called again on every route change.
-  // If you assign a function, it will re-run every time (no memo).
-  // If you assign a plain value or the return of a function,
-  // it will be reused (works like memoization).
-  ctx.container = function() {
-    return renderRecipes("/");
-  };
-
-  ctx.onMeet.set = function() {
-    document.title = "Recipe App";
-    setActiveNav("home-navigator");
-    hideTransitionIndicator(); // hide indicator once route is ready
-
-    // If a recipeId query exists, open the modal
-    if (ctx.query.recipeId) {
-      openModal(parseInt(ctx.query.recipeId));
-    } else {
-      closeModal();
-    }
-  };
-
-  // --- endReactor ---
-  // Determines if this reactor should immediately clear its history
-  // when the user navigates away.
-  //
-  // - Returning `true` means: "force go(-1)" → the route is temporary
-  //   and should be removed from the navigation stack.
-  // - Returning `false` means: "stay in history" → normal back/forward
-  //   navigation still applies.
-  //
-  // In this case:
-  // - If a modal (recipeId) is open → return false (so user can close modal first).
-  // - Otherwise → return true (page can be cleared on exit).
-  ctx.endReactor = function() {
-    if (ctx.query.recipeId) {
-      return false;
-    }
-    return true;
-  };
-});
-
-// --- Favorites reactor ---
-app.reactor("/favorites", function(ctx) {
-  // Same explanation as above for ctx.container
-  ctx.container = function() {
-    return renderRecipes("/favorites");
-  };
-
-  ctx.onMeet.set = function() {
-    document.title = "Recipe App - Favorites";
-    setActiveNav("favorites-navigator");
-    hideTransitionIndicator(); // hide once loaded
-
-    if (ctx.query.recipeId) {
-      openModal(parseInt(ctx.query.recipeId));
-    } else {
-      closeModal();
-    }
-  };
-});
-
-// --- Error reactor (for unknown routes) ---
-app.err(function(ctx) {
-  // Here container is set only once and reused (memoized),
-  // because it's assigned the return value directly.
-  ctx.container = renderError();
-
-  ctx.onMeet.set = function() {
-    document.title = "Recipe App - Page Not Found";
-    setActiveNav(null);
-    hideTransitionIndicator(); // hide once loaded
-  };
-});
-
-// --- Transition notifier ---
-// Triggered whenever navigation/transition happens.
-// We use this to show a sticky indicator at the bottom of the screen.
-app.addNotifier("transition", function() {
-  const el = document.getElementById("transition-indicator");
-  if (el) {
-    el.classList.remove("hidden"); // show indicator during transition
-  }
-});
-
-// --- Start app routing ---
-app.tap();
+import app from "./index.js";
+(() => app)(app);
 ```
+
+> If a file is not imported here, it will **not** appear in the bundle.
+
+---
+
+### `index.js` — Routing Example
+
+```js
+app.reactor(["", "/", "/home"], function(ctx) {
+  ctx.container = () => renderRecipes("/");
+
+  ctx.onMeet.set = () => {
+    document.title = "Recipe App";
+  };
+
+  ctx.endReactor = () => !ctx.query.recipeId;
+});
+```
+
+Concepts:
+
+* `container` → render logic
+* `onMeet` → lifecycle hook
+* `endReactor` → history control
 
 ---
 
 ## Live Demo
 
-Try the live version here:
-[https://spademorecipeapp.netlify.app/](https://spademorecipeapp.netlify.app/)
+👉 [https://spademorecipeapp.netlify.app/](https://spademorecipeapp.netlify.app/)
 
 ---
 
-## Notes
+## What This Project Is (and Isn’t)
 
-* The SPA core implementation is located at: `spa.js`.
-* This project is licensed under **MIT** → free to study, modify, and use.
-* It is not an official library, but rather a pattern & experiment for vanillaJS lovers.
+✔ A reference SPA architecture
+✔ A learning tool
+✔ A hackable codebase
+
+✖ Not a production-ready framework
+✖ Not optimized for DX like React/Vue
+✖ Not meant to hide complexity
+
+---
+
+## Notes for Contributors
+
+* Read the code **top-down**, not bottom-up
+* Analyzer → Bundler → Runtime is intentional
+* Comments explain *why*, not *what*
+* Breaking changes are acceptable (this is experimental)
 
 ---
 
 ## License
 
 MIT © dimaspandu
+
+Free to study, modify, and reuse.

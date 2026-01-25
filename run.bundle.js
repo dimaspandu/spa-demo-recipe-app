@@ -3,23 +3,21 @@ import { fileURLToPath } from "url";
 import bundle from "./bundler/index.js";
 
 /**
- * Resolve __filename and __dirname for ESM.
- * Node.js does not provide these globals in ES modules.
+ * Resolve __filename and __dirname for ESM modules.
  */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 /**
- * Execute bundler with explicit configuration.
+ * Execute the bundler with an explicit configuration.
  *
- * entry:
- *   Source entry file used to build the dependency graph.
+ * This script:
+ * - Builds the dependency graph starting from `pre-index.js`
+ * - Emits all bundles and assets into `dist/`
+ * - Enables minification to simulate production output
  *
- * outputDir:
- *   Destination directory for all emitted bundles and assets.
- *
- * uglified:
- *   Enables minification to simulate production output.
+ * Note:
+ * This file does NOT start a server.
  */
 await bundle({
   entry: path.join(__dirname, "pre-index.js"),

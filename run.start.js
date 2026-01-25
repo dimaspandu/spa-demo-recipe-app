@@ -4,24 +4,29 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 /**
- * Resolve __filename and __dirname in ESM context.
+ * Resolve __filename and __dirname for ESM modules.
  */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
- * Execute the bundler.
+ * Build the project before starting the server.
+ *
+ * This ensures:
+ * - dist/ is always up to date
+ * - no stale bundles are served
  */
 await import("./run.bundle.js");
 
 /**
- * Create a basic static HTTP server.
+ * Create a minimal static HTTP server for bundled output.
  *
- * rootDir:
- *   Directory to be served as the web root.
+ * Unlike `run.dev.js`, this server:
+ * - Serves files from `dist/`
+ * - Assumes all assets are already bundled
  *
- * port:
- *   Local port to listen on.
+ * @param {string} rootDir - Directory to serve as web root
+ * @param {number} port   - Port to listen on
  */
 function createStaticServer(rootDir, port) {
   const server = http.createServer((req, res) => {
@@ -57,11 +62,11 @@ function createStaticServer(rootDir, port) {
 
   server.listen(port, () => {
     console.log(`✔ Server running at http://localhost:${port}`);
-    console.log(`  Serving: ${rootDir}`);
+    console.log(`  Serving bundled output from: ${rootDir}`);
   });
 }
 
 /**
- * Start the development server for bundled output.
+ * Start server using bundled output.
  */
 createStaticServer(path.join(__dirname, "dist"), 5151);
