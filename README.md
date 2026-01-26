@@ -131,26 +131,51 @@ This simulates:
 
 ## Project Structure
 
+The structure below reflects the **actual layout of this demo repo** and how each part participates in the SPA-JSPlus pipeline.
+
 ```
-├── assets/            # Static assets (images, etc.)
-├── bundler/           # Analyzer + bundler implementation
-├── dist/              # Generated output (after bundle)
-├── helpers/           # UI & DOM helpers
-├── models/            # Data models
-├── spa/               # Core SPA engine
+SPA-DEMO-RECIPE-APP/
+├── assets/              # Static assets (images, icons, etc.)
+├── bundler/             # Analyzer + bundler implementation
+├── dist/                # Generated output (after bundling)
+├── helpers/             # DOM helpers & UI utilities
+├── models/              # Data models / domain logic
+├── spa/                 # Core SPA runtime engine
+├── utils/               # Shared low-level utilities
 │
-├── app.js             # Application bootstrap
-├── index.js           # Route & reactor definitions
-├── pre-index.js       # Bundler manifest entry
+├── app.js               # Application bootstrap & wiring
+├── index.js             # Route definitions & reactors
+├── pre-index.js         # Bundler manifest / entry graph
 │
-├── index.html         # Main HTML entry
-├── favorites.html     # Favorites page
-├── 404.html           # Error page
+├── index.html           # Main SPA HTML entry
+├── favorites.html       # Favorites route HTML
+├── 404.html             # Custom 404 fallback page
+├── index.css            # Global styles
 │
-├── run.dev.js         # Native ESM dev server
-├── run.bundle.js      # Bundler entry
-├── run.start.js       # Bundle + serve
+├── config.json          # App / bundler configuration
+│
+├── run.dev.js           # Native ESM dev runner
+├── run.bundle.js        # Analyzer + bundler entry
+├── run.start.js         # Bundle + static server
+│
+├── .gitignore
+├── LICENSE
+└── README.md
 ```
+
+### Notes on Structure
+
+* **HTML files are first-class inputs**
+  HTML is explicitly imported and bundled like JS modules.
+
+* **`pre-index.js` defines the bundle boundary**
+  Only files reachable from this entry will exist in `dist/`.
+
+* **`spa/` contains no app logic**
+  It is a reusable runtime, not a feature layer.
+
+* **`helpers/`, `models/`, `utils/` stay framework-agnostic**
+  They are plain ES modules with no SPA assumptions.
 
 ---
 
@@ -164,6 +189,7 @@ This file acts as the **bundle manifest**.
 import "./index.html";
 import "./favorites.html";
 import "./404.html";
+import "./index.css";
 import "./assets/example.png";
 
 import app from "./index.js";
@@ -177,7 +203,7 @@ import app from "./index.js";
 ### `index.js` — Routing Example
 
 ```js
-app.reactor(["", "/", "/home"], function(ctx) {
+app.reactor(["", "/", "/home"], function (ctx) {
   ctx.container = () => renderRecipes("/");
 
   ctx.onMeet.set = () => {
@@ -192,7 +218,7 @@ Concepts:
 
 * `container` → render logic
 * `onMeet` → lifecycle hook
-* `endReactor` → history control
+* `endReactor` → history & modal control
 
 ---
 
@@ -217,8 +243,8 @@ Concepts:
 ## Notes for Contributors
 
 * Read the code **top-down**, not bottom-up
-* Analyzer → Bundler → Runtime is intentional
-* Comments explain *why*, not *what*
+* Analyzer → Bundler → Runtime flow is intentional
+* Comments explain *why*, not just *what*
 * Breaking changes are acceptable (this is experimental)
 
 ---

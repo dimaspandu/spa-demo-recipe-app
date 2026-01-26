@@ -1,29 +1,41 @@
-import styles from "./index.css" with { type: "css" };
 import Spa from "./spa/index.js";
-import { appendStyleSheet } from "./utils/appendStyleSheet.js";
 import { bindNavigation } from "./helpers/bindNavigation.js";
 
 /**
- * Inject the main stylesheet into the document.
+ * Create and initialize the SPA runtime instance.
  *
- * Styles are imported as a module and applied explicitly
- * to keep side effects predictable.
- */
-appendStyleSheet(styles);
-
-/**
- * Initialize SPA runtime.
+ * The SPA instance is responsible for:
+ * - managing route reactors
+ * - coordinating lifecycle hooks
+ * - controlling DOM mount / unmount behavior
  *
  * hostdom:
- *   Root DOM element where the app will be mounted.
+ *   A single root DOM element that acts as the mounting point
+ *   for all SPA-rendered views.
+ *
+ * This element should remain stable for the entire app lifecycle.
  */
 const app = new Spa({
   hostdom: document.getElementById("app-host")
 });
 
 /**
- * Bind global navigation behavior (links, history, etc).
+ * Attach global navigation behavior to the SPA runtime.
+ *
+ * This wires:
+ * - link click interception
+ * - history push / popstate handling
+ * - route resolution delegation to the SPA engine
+ *
+ * Separation note:
+ * Navigation logic lives outside the SPA core
+ * to keep the runtime minimal and reusable.
  */
 bindNavigation(app);
 
+/**
+ * Export the SPA instance so it can be:
+ * - imported by route definitions
+ * - referenced by the bundler entry
+ */
 export { app };
