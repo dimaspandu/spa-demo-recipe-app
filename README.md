@@ -1,189 +1,109 @@
-# SPA-JSPLUS
+# SPA Demo Recipe App (SPA-JSPlus)
 
-**SPA-JSPlus** is an experimental **Single Page Application architecture** built using **vanilla JavaScript (ESM)**.
+This repo is a demo Single Page Application built with vanilla JavaScript (ESM) to showcase the SPA-JSPlus analyzer, bundler, and runtime working together in a real app.
 
-This repository is an **example/demo project** that showcases how the SPA-JSPlus analyzer, bundler, and runtime work together in a real application.
+Core project: https://github.com/dimaspandu/spa-jsplus
 
-The core SPA-JSPlus project lives here:
-[https://github.com/dimaspandu/spa-jsplus](https://github.com/dimaspandu/spa-jsplus)
-
-This project is **not a framework** and **not a library**.
-It is a **reference implementation** that demonstrates how a modern SPA can be built using:
-
-* native ES modules
-* explicit routing & lifecycle control
-* a lightweight analyzer + bundler pipeline
-* zero runtime dependencies
-
-> Think of this repo as a **learning-grade SPA engine + tooling**, not a drop-in replacement for React/Vue.
+This is not a framework or library. It is a reference implementation for learning and experimentation.
 
 ---
 
-## Philosophy
+## Highlights
 
-SPA-JSPlus is designed with the following principles:
-
-* **Vanilla-first**
-  No JSX, no virtual DOM, no framework magic.
-
-* **Explicit over implicit**
-  Routing, lifecycle, and transitions are handled intentionally.
-
-* **Tooling as learning surface**
-  Analyzer, bundler, and runtime are readable and hackable.
-
-* **Separation of concerns**
-
-  * *Analyzer* → dependency graph
-  * *Bundler* → output orchestration
-  * *SPA engine* → runtime behavior
+- Native ES modules (no framework runtime)
+- Explicit routing and lifecycle control
+- Lightweight analyzer + bundler pipeline
+- Zero runtime dependencies
+- Recipe App demo with Home and Favorites routes
+- Modal routing via query params
+- Custom 404 handling
 
 ---
 
-## Demo Project: Recipe App
+## How To Run
 
-This repository contains a **Recipe Application demo** that integrates:
+There are three supported modes.
 
-* SPA engine
-* analyzer
-* bundler
-* multiple execution modes
+### 1) Dev (native ESM, no bundling)
 
-It serves as a **real-world reference** for how the system is meant to be used.
+Runs a minimal static server with SPA fallback and focus-based auto reload.
 
-### Features
-
-* Home & Favorites routes
-* Modal routing via query params
-* Back/forward history awareness
-* Route lifecycle hooks (`onMeet`, `endReactor`)
-* Transition indicators
-* Custom 404 handling
-* Asset & CSS bundling
-
----
-
-## Execution Modes
-
-This project intentionally supports **three different ways to run the app**.
-
-### 1️⃣ Development Mode (Native ESM)
-
-**No bundling. No Node server.**
-
-```text
-Browser → index.html → native ES modules
+```bash
+node run.dev.js
 ```
 
-How to run:
+Notes:
+- `run.dev.js` reads `config.json`.
+- `port` is required.
+- `devDir` is optional. If omitted, the project root is served.
 
-* Open `index.html` directly
-* Or use VSCode **Live Server**
+Example `config.json` snippet:
 
-Best for:
+```json
+{
+  "port": 4502,
+  "devDir": "spa"
+}
+```
 
-* Debugging browser behavior
-* Understanding SPA internals
-* Learning how modules interact
-
----
-
-### 2️⃣ Bundle Only (Build Step)
-
-Runs analyzer + bundler **without starting a server**.
+### 2) Bundle only (build step)
 
 ```bash
 node run.bundle.js
 ```
 
 What it does:
+- Walks dependencies starting from `pre-index.js`
+- Emits bundled JS + copied assets into `dist/`
+- Applies minification if enabled
 
-* Traverses dependencies starting from `pre-index.js`
-* Emits bundled JS + copied assets into `dist/`
-* Applies minification if enabled
-
-Used by:
-
-* CDN builds
-* CI pipelines
-* Static hosting
-
----
-
-### 3️⃣ Bundled Start (Production-like)
+### 3) Bundled start (production-like)
 
 ```bash
 node run.start.js
 ```
 
 What happens:
-
 1. Runs `run.bundle.js`
-2. Serves the `dist/` directory via a static Node server
-
-This simulates:
-
-* production output
-* deployable static assets
-* no source files exposed
+2. Serves `dist/` via a static Node server
 
 ---
 
 ## Project Structure
 
-The structure below reflects the **actual layout of this demo repo** and how each part participates in the SPA-JSPlus pipeline.
-
 ```
 SPA-DEMO-RECIPE-APP/
-├── assets/              # Static assets (images, icons, etc.)
-├── bundler/             # Analyzer + bundler implementation
-├── dist/                # Generated output (after bundling)
-├── helpers/             # DOM helpers & UI utilities
-├── models/              # Data models / domain logic
-├── spa/                 # Core SPA runtime engine
-├── utils/               # Shared low-level utilities
-│
-├── app.js               # Application bootstrap & wiring
-├── index.js             # Route definitions & reactors
-├── pre-index.js         # Bundler manifest / entry graph
-│
-├── index.html           # Main SPA HTML entry
-├── favorites.html       # Favorites route HTML
-├── 404.html             # Custom 404 fallback page
-├── index.css            # Global styles
-│
-├── config.json          # App / bundler configuration
-│
-├── run.dev.js           # Native ESM dev runner
-├── run.bundle.js        # Analyzer + bundler entry
-├── run.start.js         # Bundle + static server
-│
-├── .gitignore
-├── LICENSE
-└── README.md
+|-- assets/              # Static assets (images, icons, etc.)
+|-- bundler/             # Analyzer + bundler implementation
+|-- dist/                # Generated output (after bundling)
+|-- helpers/             # DOM helpers and UI utilities
+|-- models/              # Data models / domain logic
+|-- spa/                 # Core SPA runtime engine
+|-- utils/               # Shared low-level utilities
+|
+|-- app.js               # Application bootstrap and wiring
+|-- index.js             # Route definitions and reactors
+|-- pre-index.js         # Bundler entry / manifest
+|
+|-- index.html           # Main SPA HTML entry
+|-- favorites.html       # Favorites route HTML
+|-- 404.html             # Custom 404 fallback page
+|-- index.css            # Global styles
+|
+|-- config.json          # App / bundler configuration
+|
+|-- run.dev.js           # Dev server (native ESM, no bundling)
+|-- run.bundle.js        # Analyzer + bundler entry
+|-- run.start.js         # Bundle + static server
+|
+|-- README.md
 ```
-
-### Notes on Structure
-
-* **HTML files are first-class inputs**
-  HTML is explicitly imported and bundled like JS modules.
-
-* **`pre-index.js` defines the bundle boundary**
-  Only files reachable from this entry will exist in `dist/`.
-
-* **`spa/` contains no app logic**
-  It is a reusable runtime, not a feature layer.
-
-* **`helpers/`, `models/`, `utils/` stay framework-agnostic**
-  They are plain ES modules with no SPA assumptions.
 
 ---
 
-## Key Files Explained
+## Key File: pre-index.js
 
-### `pre-index.js`
-
-This file acts as the **bundle manifest**.
+This file is the bundle manifest. If a file is not imported here, it will not appear in the bundle.
 
 ```js
 import "./index.html";
@@ -196,61 +116,14 @@ import app from "./index.js";
 (() => app)(app);
 ```
 
-> If a file is not imported here, it will **not** appear in the bundle.
-
----
-
-### `index.js` — Routing Example
-
-```js
-app.reactor(["", "/", "/home"], function (ctx) {
-  ctx.container = () => renderRecipes("/");
-
-  ctx.onMeet.set = () => {
-    document.title = "Recipe App";
-  };
-
-  ctx.endReactor = () => !ctx.query.recipeId;
-});
-```
-
-Concepts:
-
-* `container` → render logic
-* `onMeet` → lifecycle hook
-* `endReactor` → history & modal control
-
 ---
 
 ## Live Demo
 
-👉 [https://spademorecipeapp.netlify.app/](https://spademorecipeapp.netlify.app/)
-
----
-
-## What This Project Is (and Isn’t)
-
-✔ A reference SPA architecture
-✔ A learning tool
-✔ A hackable codebase
-
-✖ Not a production-ready framework
-✖ Not optimized for DX like React/Vue
-✖ Not meant to hide complexity
-
----
-
-## Notes for Contributors
-
-* Read the code **top-down**, not bottom-up
-* Analyzer → Bundler → Runtime flow is intentional
-* Comments explain *why*, not just *what*
-* Breaking changes are acceptable (this is experimental)
+https://spademorecipeapp.netlify.app/
 
 ---
 
 ## License
 
-MIT © dimaspandu
-
-Free to study, modify, and reuse.
+MIT Copyright (c) dimaspandu
